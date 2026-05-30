@@ -1,8 +1,5 @@
 package pl.wsb.fitnesstracker.loader;
 
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -27,14 +24,19 @@ import static java.util.Objects.isNull;
  */
 @Component
 @Profile("loadInitialData")
-@Slf4j
-@ToString
-@RequiredArgsConstructor
 class InitialDataLoader {
 
-    private final JpaRepository<User, Long> userRepository;
+    // Ręczna deklaracja tradycyjnego loggera zamiast niedziałającego @Slf4j
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InitialDataLoader.class);
 
+    private final JpaRepository<User, Long> userRepository;
     private final JpaRepository<Training, Long> trainingRepository;
+
+    // Ręczny konstruktor zamiast niedziałającego @RequiredArgsConstructor
+    public InitialDataLoader(JpaRepository<User, Long> userRepository, JpaRepository<Training, Long> trainingRepository) {
+        this.userRepository = userRepository;
+        this.trainingRepository = trainingRepository;
+    }
 
     @EventListener
     @Transactional
@@ -46,7 +48,6 @@ class InitialDataLoader {
 
         List<User> sampleUserList = generateSampleUsers();
         List<Training> sampleTrainingList = generateTrainingData(sampleUserList);
-
 
         log.info("Finished loading initial data");
     }
@@ -168,4 +169,11 @@ class InitialDataLoader {
         }
     }
 
+    @Override
+    public String toString() {
+        return "InitialDataLoader{" +
+                "userRepository=" + userRepository +
+                ", trainingRepository=" + trainingRepository +
+                '}';
+    }
 }
